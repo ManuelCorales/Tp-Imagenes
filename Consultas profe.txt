@@ -1,0 +1,3 @@
+Para qué sirven los headers¿?
+out ¿?
+como funciona struct pixel ¿?
