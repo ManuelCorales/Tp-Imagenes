@@ -18,8 +18,18 @@ int main(int argc , char* argv[]){
 		cout << "Uso: ./tp <filtro> <nthreads> <p1> <p2> <img1> <img2>" << endl;
 		return 0; 
 	}
-	string img1(argv[5]);
-	ppm img(img1);
+	string filtro(argv[1]);
+	string nthreads(argv[2]);
+	string parametro1(argv[3]);
+	string parametro2(argv[4]);
+	string img1Path(argv[5]);
+	ppm *img2 = NULL;
+	if(argv[6] != ""){
+		string img2Path(argv[6]);
+		ppm imagen2(img2Path);
+		img2 = &imagen2;
+	}
+	ppm img1(img1Path);
 
 	cout << "Aplicando filtro" << endl;
 
@@ -27,8 +37,16 @@ int main(int argc , char* argv[]){
     double accum;
 	clock_gettime(CLOCK_REALTIME, &start);
 	
-	// blackWhite(img);
-	
+	if(filtro == "shades"){
+		recorrerPixeles(img1, img2, shades, stof(parametro1));
+	}
+	if(filtro == "merge"){
+		recorrerPixeles(img1, img2, merge, stof(parametro1));
+	}
+	// if(filtro == "brightness"){
+	// 	recorrerPixeles(img1, img2, ,stof(parametro1));
+	// }
+
 	clock_gettime(CLOCK_REALTIME, &stop);
 	accum = ( stop.tv_sec - start.tv_sec )
 	        + ( stop.tv_nsec - start.tv_nsec ) * ONE_OVER_BILLION;
@@ -39,7 +57,7 @@ int main(int argc , char* argv[]){
 	string out = "../imagenesOut/imagen1.ppm";
 	//out = /c/usuarios/documentos/nombredelarchivo.ppm
 	
-	img.write(out);  
+	img1.write(out);  
 
 	cout << "Listo" << endl;
 	return 0;
