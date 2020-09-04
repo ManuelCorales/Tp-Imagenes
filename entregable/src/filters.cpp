@@ -19,16 +19,23 @@ using namespace std;
 
 ppm recorrerPixeles(ppm& imagen1, ppm* imagen2, pixel(*f)(pixel, pixel, float), float parametro){
     vector <unsigned int> dimesiones1 = {imagen1.width, imagen1.height};
-    dimesiones1.push_back(imagen1.height);
-    if(imagen2 == NULL){ //preguntar profe
+    pixel pixel1, pixel2;
+    cout << "Entré 1" << endl;
+    cout << "Entré 2" << endl;
+    if(imagen2 == NULL){
         vector <unsigned int> dimesiones2 = {(*imagen2).width, (*imagen2).height};
     }
-    for(int i = 0; i < dimesiones1[0]; i++){
-        for(int j = 0; j < dimesiones1[1]; j++){
+    cout << dimesiones1[0] << " " << dimesiones1[1] << endl;
+    for(int j = 0; j < dimesiones1[0]; j++){
+        for(int i = 0; i < dimesiones1[1]; i++){
             pixel pixel1 = imagen1.getPixel(i, j);
-            pixel pixel2 = (*imagen2).getPixel(i, j);
+            if(imagen2 != NULL){
+                pixel pixel2 = imagen2 -> getPixel(i, j);
+            }
+            cout << i << " " << j << endl;
             pixel pixel = (*f)(pixel1, pixel2, parametro);
             imagen1.setPixel(i, j, pixel);
+            
         }
     }
     return imagen1;
@@ -36,13 +43,10 @@ ppm recorrerPixeles(ppm& imagen1, ppm* imagen2, pixel(*f)(pixel, pixel, float), 
 
 pixel shades(pixel pixel1, pixel pixel2, float n){
     int grisDelPixel = (pixel1.r + pixel1.g + pixel1.b)/3;
-    for(int i = 0; i < n; i ++){
-        if(i * 256/n > grisDelPixel){
-            if(grisDelPixel >( i-1 * 256/n + i * 256/n) / 2){
-                grisDelPixel =  i - 1 * 256/n;
-            } else {
-                grisDelPixel =  i - 1 * 256/n;
-            }
+    for(int i = 0; i < n; i ++){ 
+        if((i * (256/n)) > grisDelPixel){            
+            grisDelPixel =  (i - 1) * (256/n);
+            break;
         }
     }
     return pixel(grisDelPixel, grisDelPixel, grisDelPixel);
@@ -51,7 +55,19 @@ pixel shades(pixel pixel1, pixel pixel2, float n){
 
 
 // //Llama a ppm y le pasa el filtro merge
-pixel merge(pixel pixel1, pixel pixel2, float porcentaje){
+// pixel shitpostFilter(pixel pixel1, pixel pixel2, float porcentaje){
+//     vector <int> vectorPixel1 = {pixel1.r, pixel1.g, pixel1.b};
+//     vector <int> vectorPixel2 = {pixel2.r, pixel2.g, pixel2.b};
+//     vector <int> mergedPixel;
+//     for(int i = 0; i < 3; i++){
+//         mergedPixel.push_back(vectorPixel1[i] * (porcentaje) + vectorPixel2[i] * (1 - porcentaje));
+//     }
+//     return pixel(mergedPixel[0], mergedPixel[1], mergedPixel[2]);
+// }
+
+
+pixel merge(pixel pixel1, pixel pixel2, float n){
+    float porcentaje = n / 100;
     vector <int> vectorPixel1 = {pixel1.r, pixel1.g, pixel1.b};
     vector <int> vectorPixel2 = {pixel2.r, pixel2.g, pixel2.b};
     vector <int> mergedPixel;
@@ -60,6 +76,7 @@ pixel merge(pixel pixel1, pixel pixel2, float porcentaje){
     }
     return pixel(mergedPixel[0], mergedPixel[1], mergedPixel[2]);
 }
+//
 
 // -1 negro. 0 igual.1 todo blanco
 

@@ -12,23 +12,28 @@ using namespace std;
 
 int main(int argc , char* argv[]){
 	
+	cout << "Arranco el programa" << endl;
 	// Pasamos 0 en caso de no utilizar p2 o  "" en img2
 	if(string(argv[1]) == "-help")
 	{
 		cout << "Uso: ./tp <filtro> <nthreads> <p1> <p2> <img1> <img2>" << endl;
 		return 0; 
 	}
+	cout << "pasé" << endl;
 	string filtro(argv[1]);
 	string nthreads(argv[2]);
 	string parametro1(argv[3]);
 	string parametro2(argv[4]);
 	string img1Path(argv[5]);
 	ppm *img2 = NULL;
+	cout << argv[6] << endl;
+	cout << "pasé 2" << endl;
 	if(argv[6] != ""){
 		string img2Path(argv[6]);
 		ppm imagen2(img2Path);
 		img2 = &imagen2;
 	}
+	cout << "pasé 3" << endl;
 	ppm img1(img1Path);
 
 	cout << "Aplicando filtro" << endl;
@@ -36,7 +41,9 @@ int main(int argc , char* argv[]){
 	struct timespec start, stop;
     double accum;
 	clock_gettime(CLOCK_REALTIME, &start);
-	
+
+    cout << "Por loopear imagenes" << endl;
+
 	if(filtro == "shades"){
 		recorrerPixeles(img1, img2, shades, stof(parametro1));
 	}
@@ -46,6 +53,7 @@ int main(int argc , char* argv[]){
 	// if(filtro == "brightness"){
 	// 	recorrerPixeles(img1, img2, ,stof(parametro1));
 	// }
+    cout << "Termine de loopear" << endl;
 
 	clock_gettime(CLOCK_REALTIME, &stop);
 	accum = ( stop.tv_sec - start.tv_sec )
