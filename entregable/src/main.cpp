@@ -45,14 +45,17 @@ int main(int argc , char* argv[]){
     cout << "Por loopear imagenes" << endl;
 
 	if(filtro == "shades"){
-		recorrerPixeles(img1, img2, shades, stof(parametro1));
+		recorrerPixeles(img1, img2, shades, stof(parametro1), stof(parametro2));
 	}
 	if(filtro == "merge"){
-		recorrerPixeles(img1, img2, merge, stof(parametro1));
+		recorrerPixeles(img1, img2, merge, stof(parametro1), stof(parametro2));
 	}
-	// if(filtro == "brightness"){
-	// 	recorrerPixeles(img1, img2, ,stof(parametro1));
-	// }
+	if(filtro == "brightness"){
+		recorrerPixeles(img1, img2, brightness, stof(parametro1), stof(parametro2));
+	}
+	if(filtro == "frame"){
+		recorrerPixeles(img1, img2, frame, stof(parametro1), stof(parametro2));
+	}
     cout << "Termine de loopear" << endl;
 
 	clock_gettime(CLOCK_REALTIME, &stop);
