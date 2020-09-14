@@ -28,12 +28,14 @@ int main(int argc , char* argv[]){
 	ppm *img2 = NULL;
 	cout << argv[6] << endl;
 	cout << "pasé 2" << endl;
+	ppm imagen2("../ImagenesIn/imagen3.ppm");
+	cout << "Pixel rojo: " << (imagen2.getPixel(1, 1)).r << endl;
 	if(argv[6] != ""){
 		string img2Path(argv[6]);
-		ppm imagen2(img2Path);
-		img2 = &imagen2;
+		ppm imagenAux(img2Path);
+		imagen2 = imagenAux;
+		cout << "Pixel rojo 2: " << (imagen2.getPixel(1, 1)).r << endl;
 	}
-	cout << "pasé 3" << endl;
 	ppm img1(img1Path);
 
 	cout << "Aplicando filtro" << endl;
@@ -45,16 +47,23 @@ int main(int argc , char* argv[]){
     cout << "Por loopear imagenes" << endl;
 
 	if(filtro == "shades"){
-		recorrerPixeles(img1, img2, shades, stof(parametro1), stof(parametro2));
+		recorrerPixeles(img1, imagen2, shades, stof(parametro1), stof(parametro2));
 	}
 	if(filtro == "merge"){
-		recorrerPixeles(img1, img2, merge, stof(parametro1), stof(parametro2));
+		recorrerPixeles(img1, imagen2, merge, stof(parametro1), stof(parametro2));
 	}
 	if(filtro == "brightness"){
-		recorrerPixeles(img1, img2, brightness, stof(parametro1), stof(parametro2));
+		recorrerPixeles(img1, imagen2, brightness, stof(parametro1), stof(parametro2));
 	}
 	if(filtro == "frame"){
-		recorrerPixeles(img1, img2, frame, stof(parametro1), stof(parametro2));
+		recorrerPixeles(img1, imagen2, frame, stof(parametro1), stof(parametro2));
+	}
+	if(filtro == "edgeDetection"){
+		recorrerPixelesConvulsion(img1, edgeDetection, stof(parametro1), stof(parametro2));
+		cout << "Devolviendo2" << endl;
+	}
+	if(filtro == "zoom"){
+		zoom(img1, stoi(parametro1));
 	}
     cout << "Termine de loopear" << endl;
 

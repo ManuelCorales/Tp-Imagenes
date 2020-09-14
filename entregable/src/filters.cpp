@@ -17,36 +17,57 @@ using namespace std;
 
 //Llama a ppm y le pasa el filtro shades
 
-ppm recorrerPixeles(ppm& imagen1, ppm* imagen2, pixel(*f)(pixel, pixel, vector<int>, vector<unsigned int>, float, float), float parametro1, float parametro2){
+ppm recorrerPixeles(ppm& imagen1, ppm& imagen2, pixel(*f)(pixel, pixel, vector<int>, vector<unsigned int>, float, float), float parametro1, float parametro2){
     vector <unsigned int> dimesiones1 = {imagen1.width, imagen1.height};
     pixel pixel1, pixel2;
-    cout << "Entré 1" << endl;
-    cout << "Entré 2" << endl;
-    if(imagen2 != NULL){
-        vector <unsigned int> dimesiones2 = {(*imagen2).width, (*imagen2).height};
+    if(&imagen2 != NULL){
+        vector <unsigned int> dimesiones2 = {imagen2.width, imagen2.height};
         cout << dimesiones2[0] << " " << dimesiones2[1] << endl;
     }
-    cout << "La imagen 2 es: " << imagen2 << endl;
+    cout << "La imagen 2 es: " << &imagen2 << endl;
     cout << dimesiones1[0] << " " << dimesiones1[1] << endl;
     vector<int> posicionPixel = {0, 0};
-    for(int j = 0; j < dimesiones1[0]; j++){
-        for(int i = 0; i < dimesiones1[1]; i++){
-            pixel pixel1 = imagen1.getPixel(i, j);
-            posicionPixel[0] = i;
-            posicionPixel[1] = j;
-            // cout << "Sali3 " << i << " " << j << endl;
-            // if(imagen2 != NULL){
-            //     cout << "Sali4 " << endl;
-            //     pixel pixel2 = imagen2 -> getPixel(i, j);
-            //     cout << "Sali5 " << endl;
-            // }
+    for(int i = 0; i < dimesiones1[1]; i++){
+        for(int j = 0; j < dimesiones1[0]; j++){
             // cout << i << " " << j << endl;
+            posicionPixel = {i, j};
+            pixel pixel1 = imagen1.getPixel(i, j);
+            pixel pixel2 = imagen2.getPixel(i, j);
             pixel pixel = (*f)(pixel1, pixel2, posicionPixel, dimesiones1, parametro1, parametro2);
-            // cout << "Sali" << endl;
             imagen1.setPixel(i, j, pixel);
-            // cout << "Sali2" << endl;
         }
     }
+    return imagen1;
+}
+
+ppm recorrerPixelesConvulsion(ppm& imagen1, pixel(*f)(pixel, vector<int>, vector<pixel>, vector<unsigned int>, float, float), float parametro1, float parametro2){
+    vector <unsigned int> dimesiones1 = {imagen1.width, imagen1.height};
+    cout << "xd "<< imagen1.height << " " << imagen1.width << endl;
+    pixel pixelSeleccionado;
+    vector<pixel> matrizDePixeles = {pixel(), pixel(), pixel(), pixel(), pixel(), pixel(), pixel(), pixel(), pixel()};
+    vector<int> posicionPixel = {0, 0};
+    for(int i = 1; i < imagen1.height - 1; i++){
+        for(int j = 1; j < imagen1.width - 1; j++){
+            pixel pixelSeleccionado = imagen1.getPixel(i, j);
+            posicionPixel = {i, j};
+            for(int z = -1; z < 8; z++){
+                if(z < 2){
+                    // cout << i - 1 << " " << j + z << endl;
+                    matrizDePixeles[z] = imagen1.getPixel(i - 1, j + z);
+                } else if(z < 5){
+                    // cout << i  << " " << j + z - 3 << endl;
+                    matrizDePixeles[z] = imagen1.getPixel(i, j + z - 3);
+                } else {
+                    // cout << i + 1 << " " << j + z - 6 << endl;
+                    matrizDePixeles[z] = imagen1.getPixel(i + 1, j + z - 6);
+                }
+            }
+            pixel pixelDevuelto = (*f)(pixelSeleccionado, posicionPixel, matrizDePixeles, dimesiones1, parametro1, parametro2);
+            imagen1.setPixel(i, j, pixelDevuelto);
+            // cout << i << " " << j << pixel.r << pixel.g << pixel.b << endl;
+        }
+    }
+    cout << "Devolviendo" << endl;
     return imagen1;
 }
 
@@ -76,9 +97,11 @@ pixel shades(pixel pixel1, pixel pixel2, vector<int> posicionPixel, vector<unsig
 
 
 pixel merge(pixel pixel1, pixel pixel2, vector<int> posicionPixel, vector<unsigned int> dimensiones1, float n1, float n2){
-    float porcentaje = n1 / 100;
+    float porcentaje = n1;
     vector <int> vectorPixel1 = {pixel1.r, pixel1.g, pixel1.b};
     vector <int> vectorPixel2 = {pixel2.r, pixel2.g, pixel2.b};
+    // cout << "Vector pixel 1 " << vectorPixel1[0] << " " << vectorPixel1[1] << " " << vectorPixel1[2] << " " << endl;
+    // cout << "Vector pixel 2 " << vectorPixel2[0] << " " << vectorPixel2[1] << " " << vectorPixel2[2] << " " << endl;
     vector <int> mergedPixel;
     for(int i = 0; i < 3; i++){
         mergedPixel.push_back(vectorPixel1[i] * (porcentaje) + vectorPixel2[i] * (1 - porcentaje));
@@ -99,14 +122,57 @@ pixel brightness(pixel pixel1, pixel pixel2, vector<int> posicionPixel, vector<u
 }
 
 // //Llama a ppm y le pasa el filtro edgeDetection
-// void edgeDetection(){
+pixel edgeDetection(pixel pixel1, vector<int> posicionPixel, vector<pixel> matrizDePixeles, vector<unsigned int> dimensiones1, float n1, float n2){
+    vector<int> filtroValoresHorizontales = {1, 0, -1, 2, 0, -2, 1, 0, -1};
+    vector<int> filtroValoresVerticales = {1, 2, 1, 0, 0, 0, -1, -2, -1};
+    vector <int> vectorPixel1 = {pixel1.r, pixel1.g, pixel1.b};
+    pixel pixelFinal(0, 0, 0);
+    int rH, gH, bH, rV, gV, bV;
+    int grisDePixel, valorPixel, sumaPixelTotal;
+    for(int i = 0; i < matrizDePixeles.size(); i++){
+        rH += matrizDePixeles[i].r * filtroValoresHorizontales[i];
+        gH += matrizDePixeles[i].g * filtroValoresHorizontales[i];
+        bH += matrizDePixeles[i].b * filtroValoresHorizontales[i];
 
-// }
+        rV += matrizDePixeles[i].r * filtroValoresVerticales[i];
+        gV += matrizDePixeles[i].g * filtroValoresVerticales[i];
+        bV += matrizDePixeles[i].b * filtroValoresVerticales[i];
+    }
+    // cout << "r: " << rH << " " << rV << endl;
+    // cout << "g: " << gH << " " << gV << endl;
+    // cout << "b: " << bH << " " << bV << endl;
+    // cout << "rgb: " << r << " " << g << " " << b << endl;
+    pixelFinal.r = (sqrt((rH * rH) + (rV * rV)));
+    pixelFinal.g = (sqrt((gH * gH) + (gV * gV)));
+    pixelFinal.b = (sqrt((bH * bH) + (bV * bV)));
+    pixelFinal.truncate();
+    // cout << "pixel final rgb: " << pixelFinal.r << " " << pixelFinal.g << " " << pixelFinal.b << endl; 
+    return pixelFinal;
+}
 
-// //Llama a ppm y le pasa el filtro zoom
-// void zoom(){
-
-// }
+//Llama a ppm y le pasa el filtro zoom
+ppm zoom(ppm& imagen, int n1){
+    ppm img_zoomeada(imagen.width * n1, imagen.height * n1);
+    vector <unsigned int> dimesiones1 = {imagen.width, imagen.height};
+    cout << dimesiones1[0] << " " << dimesiones1[1] << endl;
+    pixel pixel;
+    unsigned int traslado_I, traslado_J;
+    vector<int> posicionPixel = {0, 0};
+    for(int i = 0; i < dimesiones1[1]; i++){
+        for(int j = 0; j < dimesiones1[0]; j++){
+            pixel = imagen.getPixel(i, j);
+            traslado_I = (i + (i * (n1 - 1)));
+            traslado_J = (j + (j * (n1 - 1)));
+            for(int z = 0; z < n1; z++){
+                for(int x = 0; x < n1; x++){
+                    img_zoomeada.setPixel(traslado_I + z, traslado_J + x, pixel);
+                }
+            }
+        }
+    }
+    imagen = img_zoomeada;
+    return imagen;
+}
 
 // Color de gris n1 = [0, 255]
 // Tamaño de marco (pixeles) n2
