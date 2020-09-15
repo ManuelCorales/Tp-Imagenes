@@ -21,7 +21,7 @@ int main(int argc , char* argv[]){
 	}
 	cout << "pasé" << endl;
 	string filtro(argv[1]);
-	string nthreads(argv[2]);
+	string nThreads(argv[2]);
 	string parametro1(argv[3]);
 	string parametro2(argv[4]);
 	string img1Path(argv[5]);
@@ -47,19 +47,19 @@ int main(int argc , char* argv[]){
     cout << "Por loopear imagenes" << endl;
 
 	if(filtro == "shades"){
-		recorrerPixeles(img1, imagen2, shades, stof(parametro1), stof(parametro2));
+		repartirImagenThreads(stoi(nThreads), img1, imagen2, shades, stof(parametro1), stof(parametro2));
 	}
 	if(filtro == "merge"){
-		recorrerPixeles(img1, imagen2, merge, stof(parametro1), stof(parametro2));
+		repartirImagenThreads(stoi(nThreads), img1, imagen2, merge, stof(parametro1), stof(parametro2));
 	}
 	if(filtro == "brightness"){
-		recorrerPixeles(img1, imagen2, brightness, stof(parametro1), stof(parametro2));
+		repartirImagenThreads(stoi(nThreads), img1, imagen2, brightness, stof(parametro1), stof(parametro2));
 	}
 	if(filtro == "frame"){
-		recorrerPixeles(img1, imagen2, frame, stof(parametro1), stof(parametro2));
+		repartirImagenThreads(stoi(nThreads), img1, imagen2, frame, stof(parametro1), stof(parametro2));
 	}
 	if(filtro == "edgeDetection"){
-		recorrerPixelesConvulsion(img1, edgeDetection, stof(parametro1), stof(parametro2));
+		recorrerPixelesConvolucion(img1, edgeDetection, stof(parametro1), stof(parametro2));
 		cout << "Devolviendo2" << endl;
 	}
 	if(filtro == "zoom"){

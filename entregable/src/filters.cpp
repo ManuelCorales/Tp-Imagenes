@@ -17,32 +17,47 @@ using namespace std;
 
 //Llama a ppm y le pasa el filtro shades
 
-ppm recorrerPixeles(ppm& imagen1, ppm& imagen2, pixel(*f)(pixel, pixel, vector<int>, vector<unsigned int>, float, float), float parametro1, float parametro2){
-    vector <unsigned int> dimesiones1 = {imagen1.width, imagen1.height};
-    pixel pixel1, pixel2;
-    if(&imagen2 != NULL){
-        vector <unsigned int> dimesiones2 = {imagen2.width, imagen2.height};
-        cout << dimesiones2[0] << " " << dimesiones2[1] << endl;
-    }
-    cout << "La imagen 2 es: " << &imagen2 << endl;
-    cout << dimesiones1[0] << " " << dimesiones1[1] << endl;
-    vector<int> posicionPixel = {0, 0};
-    for(int i = 0; i < dimesiones1[1]; i++){
-        for(int j = 0; j < dimesiones1[0]; j++){
-            // cout << i << " " << j << endl;
-            posicionPixel = {i, j};
-            pixel pixel1 = imagen1.getPixel(i, j);
-            pixel pixel2 = imagen2.getPixel(i, j);
-            pixel pixel = (*f)(pixel1, pixel2, posicionPixel, dimesiones1, parametro1, parametro2);
-            imagen1.setPixel(i, j, pixel);
+ppm repartirImagenThreads(int nThreads, ppm& imagen1, ppm& imagen2, pixel(*f)(pixel, pixel, vector<int>, vector<unsigned int>, float, float), float parametro1, float parametro2){
+    cout << "Entré" << endl;
+    vector<thread> vectorThreads;
+    vector<unsigned int> intervaloColumnas;
+    for(int i = 1; i < nThreads + 1 ; i++){
+        unsigned int resultado = imagen1.width / nThreads;
+        intervaloColumnas = {resultado * (i - 1), resultado * i};
+        if(i == nThreads){
+            intervaloColumnas = {resultado * (i - 1), imagen1.width};
         }
+        vectorThreads.push_back(thread(recorrerPixeles, &imagen1, &imagen2, (*f), parametro1, parametro2, intervaloColumnas));
+    }
+    cout << "tamaño vector: " << vectorThreads.size() << endl;
+    for(int i = 0; i != nThreads; i++){
+        vectorThreads[i].join();
     }
     return imagen1;
 }
 
-ppm recorrerPixelesConvulsion(ppm& imagen1, pixel(*f)(pixel, vector<int>, vector<pixel>, vector<unsigned int>, float, float), float parametro1, float parametro2){
+ppm recorrerPixeles(ppm *imagen1, ppm *imagen2, pixel(*f)(pixel, pixel, vector<int>, vector<unsigned int>, float, float), float parametro1, float parametro2, vector<unsigned int> intervaloColumnas){
+    vector <unsigned int> dimesiones1 = {imagen1->width, imagen1->height};
+    pixel pixel1, pixel2;
+    if(&imagen2 != NULL){
+        vector <unsigned int> dimesiones2 = {imagen2->width, imagen2->height};
+    }
+    vector<int> posicionPixel = {0, 0};
+    for(int i = 0; i < dimesiones1[1]; i++){
+        for(int j = intervaloColumnas[0]; j < intervaloColumnas[1]; j++){
+            // cout << i << " " << j << endl;
+            posicionPixel = {i, j};
+            pixel pixel1 = imagen1->getPixel(i, j);
+            pixel pixel2 = imagen2->getPixel(i, j);
+            pixel pixel = (*f)(pixel1, pixel2, posicionPixel, dimesiones1, parametro1, parametro2);
+            imagen1->setPixel(i, j, pixel);
+        }
+    }
+    return *imagen1;
+}
+
+ppm recorrerPixelesConvolucion(ppm& imagen1, pixel(*f)(pixel, vector<int>, vector<pixel>, vector<unsigned int>, float, float), float parametro1, float parametro2){
     vector <unsigned int> dimesiones1 = {imagen1.width, imagen1.height};
-    cout << "xd "<< imagen1.height << " " << imagen1.width << endl;
     pixel pixelSeleccionado;
     vector<pixel> matrizDePixeles = {pixel(), pixel(), pixel(), pixel(), pixel(), pixel(), pixel(), pixel(), pixel()};
     vector<int> posicionPixel = {0, 0};
