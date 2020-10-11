@@ -130,12 +130,14 @@ int main(int argc , char* argv[]){
 		accum = ( stop.tv_sec - start.tv_sec ) + ( stop.tv_nsec - start.tv_nsec ) * ONE_OVER_BILLION;
 		printf( "Duración del filtrado: %lf s\n", accum);
 
-		string pathDump = "./dumpsTiempos/loader.txt";
+		string pathDump = "./dumpsTiempos/loader.csv";
 		ofstream archivoDeSalida(pathDump.c_str(), ios_base::app);
 		if (archivoDeSalida.is_open())
 		{
 			cout << "Dumpeando información" << endl;
-			archivoDeSalida << "T" << accum << " NT" << nThreads << " F" << filtro << " CP" << superficieTotal <<  endl;
+			// Formato: Tiempo, Número de threads, filtro y cantidad de pixeles
+			string dump = to_string(accum) + "," + to_string(nThreads) + "," + filtro + "," + to_string(superficieTotal) + "\n";
+			archivoDeSalida << dump;
 			archivoDeSalida.close();
 		}
 

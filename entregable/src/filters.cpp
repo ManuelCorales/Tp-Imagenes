@@ -111,7 +111,7 @@ void recorrerPixelesConvolucion(ppm *imagen1, ppm *imagen2, pixel(*f)(pixel, vec
     }
 
     for(int i = 1; i < imagen1->height - 1; i++){
-        for(int j = intervaloColumnas[0]; j < intervaloColumnas[1]; j++){
+        for(int j = intervaloColumnas[0]; j < intervaloColumnas[1] + 2; j++){
             pixel pixelSeleccionado = imagen1->getPixel(i, j);
             posicionPixel = {i, j};
             for(int z = -1; z < 8; z++){
@@ -185,7 +185,10 @@ pixel edgeDetection(pixel pixel1, vector<int> posicionPixel, vector<pixel> matri
     pixelFinal.g = (sqrt((gH * gH) + (gV * gV)));
     pixelFinal.b = (sqrt((bH * bH) + (bV * bV)));
     pixelFinal.truncate();
-    
+    int grisPromedio = pixelFinal.cumsum() / 3;
+    pixelFinal.r = grisPromedio;
+    pixelFinal.g = grisPromedio;
+    pixelFinal.b = grisPromedio;
     return pixelFinal;
 }
 
@@ -210,6 +213,17 @@ ppm zoom(ppm& imagen, int n1){
     }
     imagen = img_zoomeada;
     return imagen;
+}
+
+pixel calido(pixel pixel1, pixel pixel2, vector<int> posicionPixel, vector<unsigned int> dimensiones1, float n1, float n2){
+    float porcentaje = n1;
+    vector <int> vectorPixel1 = {pixel1.r, pixel1.g, pixel1.b};
+    vector <int> mergedPixel;
+    pixel1.r = pixel1.r + 40;
+    pixel1.g = pixel1.g - 10;
+    pixel1.b = pixel1.b - 100;
+    pixel1.truncate();
+    return pixel(pixel1.r, pixel1.g, pixel1.b);
 }
 
 // Color de gris n1 = [0, 255]

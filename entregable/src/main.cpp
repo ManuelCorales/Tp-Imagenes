@@ -52,6 +52,10 @@ int main(int argc , char* argv[]){
 		repartirImagenThreads(stoi(nThreads), img1, img2, brightness, stof(parametro1), stof(parametro2));
 		filtradoTerminado = true;
 	}
+	if(filtro == "calido"){
+		repartirImagenThreads(stoi(nThreads), img1, img2, calido, stof(parametro1), stof(parametro2));
+		filtradoTerminado = true;
+	}
 	if(filtro == "frame"){
 		repartirImagenThreads(stoi(nThreads), img1, img2, frame, stof(parametro1), stof(parametro2));
 		filtradoTerminado = true;
@@ -74,12 +78,14 @@ int main(int argc , char* argv[]){
 		printf( "Duración del filtrado: %lf s\n", accum);
 		cout << "Escribiendo imagen" << endl;
 
-		string pathDump = "./dumpsTiempos/tp.txt";
+		string pathDump = "./dumpsTiempos/tp.csv";
 		ofstream archivoDeSalida(pathDump.c_str(), ios_base::app);
 		if (archivoDeSalida.is_open())
 		{
 			cout << "Dumpeando información" << endl;
-			archivoDeSalida << "T" << accum << " NT" << nThreads << " F" << filtro << " CP" << (img1.height * img1.width) <<  endl;
+			// Formato: Tiempo, Número de threads, filtro y cantidad de pixeles
+			string dump = to_string(accum) + "," + nThreads + "," + filtro + "," + to_string(img1.height * img1.width) + "\n";
+			archivoDeSalida << dump;
 			archivoDeSalida.close();
 		}
 
