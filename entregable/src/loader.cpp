@@ -91,6 +91,10 @@ int main(int argc , char* argv[]){
 				vectorThreads.push_back(thread(repartirImagenesPixelToPixelLoader, auxImagenes, auxImagenesNombres, frame, 30, 30));
 				filtradoTerminado = true;
 			}
+			if(filtro == "calido"){
+				vectorThreads.push_back(thread(repartirImagenesPixelToPixelLoader, auxImagenes, auxImagenesNombres, calido, 30, 30));
+				filtradoTerminado = true;
+			}
 			if(filtro == "edgeDetection"){
 				vectorThreads.push_back(thread(repartirImagenesConvolucionLoader, auxImagenes, auxImagenesNombres, edgeDetection, 1, 1));
 				filtradoTerminado = true;
@@ -102,6 +106,10 @@ int main(int argc , char* argv[]){
 			}
 			if(filtro == "brightness"){
 				repartirImagenesPixelToPixelLoader(auxImagenes, auxImagenesNombres, brightness, 0.5, 0.5);
+				filtradoTerminado = true;
+			}
+			if(filtro == "calido"){
+				repartirImagenesPixelToPixelLoader(auxImagenes, auxImagenesNombres, calido, 30, 30);
 				filtradoTerminado = true;
 			}
 			if(filtro == "frame"){
